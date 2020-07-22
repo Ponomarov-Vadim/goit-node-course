@@ -6,7 +6,7 @@
   "scripts": {
     "start": "npm run index.js",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "nodemon ./index.js localhost 8080"
+    "dev": "nodemon ./src/app.js"
   },
   "repository": {
     "type": "git",
@@ -19,7 +19,12 @@
   },
   "homepage": "https://github.com/Ponomarov-Vadim/goit-node-course#readme",
   "dependencies": {
+    "body-parser": "^1.19.0",
+    "cors": "^2.8.5",
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
     "fs": "0.0.1-security",
+    "morgan": "^1.10.0",
     "nodemon": "^2.0.4",
     "path": "^0.12.7",
     "yargs": "^15.4.1"
