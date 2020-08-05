@@ -4,20 +4,36 @@ const bodyparser = require("body-parser");
 const cors = require("cors");
 const morgan = require("morgan");
 
-const userRouter = require("../src/router/userRouter");
+const userRouter = require("./routers/userRouter");
+const connectMongoDb = require("./database/");
 
 dotenv.config();
 
-const app = express();
+const server = async (port, callback) => {
+  try {
+    const schemas = await connectMongoDb();
 
-app.use(bodyparser.json());
-app.use(cors());
-app.use(morgan("combined"));
+    const app = express();
 
-app.use("/api/contacts", userRouter);
+    app.use(bodyparser.json());
+    app.use(cors());
+    app.use(morgan("combined"));
 
-app.use((req, res, next) => {
-  res.status(404).send({ data: { message: "Not Found" } });
-});
+    app.use((req, res, next) => {
+      req.mongoDb = schemas;
+      next();
+    });
 
-module.exports = { app };
+    app.use("/api/contacts", userRouter);
+
+    app.use((req, res, next) => {
+      res.status(404).send({ data: { message: "Not Found" } });
+    });
+
+    app.listen(port, callback);
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+module.exports = server;

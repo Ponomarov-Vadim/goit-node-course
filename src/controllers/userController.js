@@ -1,85 +1,110 @@
-const { isEqual, throwErr } = require("../helpers");
-const path = require("path");
-const fs = require("fs").promises;
+const { throwErr } = require("../helpers");
 
-const contactsPath = `${path.dirname(
-  "../goit-node-course/db/contacts.json"
-)}/contacts.json`;
-
-const getContacts = async () => {
-  const result = await fs.readFile(contactsPath, "utf-8");
-  return JSON.parse(result);
-};
-
-const setContacts = async (data) => {
-  await fs.writeFile(contactsPath, JSON.stringify(data), "utf-8");
-};
+const mongoose = require("mongoose");
 
 const user = {
-  get: async (data) => {
-    const id = parseInt(data.params.id, 10);
+  getAll: async (_, { mongoDb }) => {
+    const { userModel } = mongoDb;
 
-    const users = await getContacts();
+    const users = await userModel.find();
 
-    const user = users.find((user) => isEqual(user.id, id));
-
-    if (!user) throwErr(404, "Not found");
-
-    return { status: 200, user };
+    return {
+      status: 200,
+      users,
+    };
   },
 
-  getAll: async () => ({ status: 200, users: await getContacts() }),
+  get: async (data, { mongoDb }) => {
+    const _id = data.params.id;
+    const { userModel } = mongoDb;
 
-  create: async (data) => {
-    const { name, email, phone } = data;
+    const user = await userModel.findById(_id);
 
-    if (name === undefined || email === undefined || phone === undefined) {
+    if (!user) {
+      throwErr(404, "user not found");
+    }
+
+    return {
+      status: 200,
+      user,
+    };
+  },
+
+  create: async (data, { mongoDb }) => {
+    const { userModel } = mongoDb;
+
+    const { name, email, phone, subscription, password, token = "" } = data;
+
+    if (
+      name === undefined ||
+      email === undefined ||
+      phone === undefined ||
+      subscription === undefined ||
+      password === undefined
+    ) {
       throwErr(400, "Missing required name field");
     }
 
-    const users = await getContacts();
+    await userModel.create({
+      _id: mongoose.Types.ObjectId(),
+      name,
+      email,
+      phone,
+      subscription,
+      password,
+      token,
+    });
 
-    users.push({ id: users.length + 1, name, email, phone });
-
-    setContacts(users);
-
-    return { status: 201, user: { id: users.length, name, email, phone } };
+    return {
+      status: 201,
+      user: { name, email, phone, subscription, password, token },
+    };
   },
 
-  update: async (data) => {
-    const id = parseInt(data.params.id, 10);
-    const { name, email, phone } = data;
+  update: async (data, { mongoDb }) => {
+    const { userModel } = mongoDb;
+    const _id = data.params.id;
 
-    if (name === undefined || email === undefined || phone === undefined) {
-      throwErr(400, "Missing fields");
+    const { name, email, phone, subscription, password, token } = data;
+
+    if (
+      name === undefined ||
+      email === undefined ||
+      phone === undefined ||
+      subscription === undefined ||
+      password === undefined
+    ) {
+      throwErr(400, "Missing required name field");
     }
-    const users = await getContacts();
 
-    const userId = users.findIndex((user) => isEqual(user.id, id));
+    const user = await userModel.findOneAndUpdate(
+      { _id },
+      {
+        name,
+        email,
+        phone,
+        subscription,
+        password,
+        token,
+      }
+    );
 
-    if (!users[userId]) throwErr(404, "Not found");
-
-    users[userId] = { id, name, email, phone };
-
-    setContacts(users);
-
-    return { status: 200, user: users[userId] };
+    return {
+      status: 200,
+      user,
+    };
   },
 
-  delete: async (data) => {
-    const id = parseInt(data.params.id, 10);
+  delete: async (data, { mongoDb }) => {
+    const { userModel } = mongoDb;
+    const _id = data.params.id;
 
-    const users = await getContacts();
+    await userModel.deleteOne({ _id });
 
-    const userId = users.findIndex((user) => isEqual(user.id, id));
-
-    if (!users[userId]) throwErr(404, "Not found");
-
-    users.splice(userId, 1);
-
-    setContacts(users);
-
-    return { status: 200, message: "Contact deleted" };
+    return {
+      status: 200,
+      message: "Contact deleted",
+    };
   },
 };
 

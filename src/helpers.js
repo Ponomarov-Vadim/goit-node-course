@@ -3,7 +3,7 @@ const makeCall = async (req, res, func) => {
     const data = req.method === "GET" ? req.query : req.body;
     data.params = req.params;
 
-    const result = await func(data);
+    const result = await func(data, { mongoDb: req.mongoDb });
     const { status, ...request } = result;
     res.status(status).send(request);
   } catch (err) {
