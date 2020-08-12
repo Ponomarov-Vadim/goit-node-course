@@ -1,8 +1,15 @@
 const server = require("./server");
 
+const {
+  env: { PORT },
+} = process;
+
 const log = (err) => {
-  if (err) throw console.log(err);
-  console.log(`Server start in ${process.env.PORT} port`);
+  if (err) {
+    console.log("Erroe on listen: ", err);
+    process.exit(0);
+  }
+  console.log(`Server start in ${PORT} port`);
 };
 
-server(process.env.PORT, log);
+server(PORT, log);

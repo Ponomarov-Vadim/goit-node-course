@@ -1,9 +1,13 @@
 const makeCall = async (req, res, func) => {
   try {
     const data = req.method === "GET" ? req.query : req.body;
-    data.params = req.params;
+    const ctx = {
+      mongoDb: req.mongoDb,
+    };
+    data.params = req.params || {};
 
-    const result = await func(data, { mongoDb: req.mongoDb });
+    const result = await func(data, ctx);
+
     const { status, ...request } = result;
     res.status(status).send(request);
   } catch (err) {

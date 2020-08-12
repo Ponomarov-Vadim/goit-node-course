@@ -1,30 +1,31 @@
 const dotenv = require("dotenv");
 const express = require("express");
-const bodyparser = require("body-parser");
 const cors = require("cors");
 const morgan = require("morgan");
 
-const userRouter = require("./routers/userRouter");
-const connectMongoDb = require("./database/");
+const { contact, auth, user } = require("./routers/");
+const { setupMongoDb } = require("./database/");
 
-dotenv.config();
+dotenv.config({ path: __dirname + "/../.env" });
 
 const server = async (port, callback) => {
   try {
-    const schemas = await connectMongoDb();
+    const mongoDb = await setupMongoDb();
 
     const app = express();
 
-    app.use(bodyparser.json());
+    app.use(express.json());
     app.use(cors());
     app.use(morgan("combined"));
 
     app.use((req, res, next) => {
-      req.mongoDb = schemas;
+      req.mongoDb = mongoDb;
       next();
     });
 
-    app.use("/api/contacts", userRouter);
+    app.use("/api/contacts", contact);
+    app.use("/auth", auth);
+    app.use("/users", user);
 
     app.use((req, res, next) => {
       res.status(404).send({ data: { message: "Not Found" } });

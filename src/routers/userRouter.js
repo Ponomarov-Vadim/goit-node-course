@@ -1,25 +1,13 @@
 const { Router } = require("express");
 const { makeCall } = require("../helpers");
-const userController = require("../controllers/userController");
+const { jwtMiddleware } = require("./../middleware/jwt");
 
-const userRouter = Router();
+const user = require("../controllers/userController");
 
-userRouter.get("/get", (req, res) => makeCall(req, res, userController.getAll));
+const router = Router();
 
-userRouter.get("/get/:id", (req, res) =>
-  makeCall(req, res, userController.get)
+router.get("/current/:authorization", jwtMiddleware, (req, res) =>
+  makeCall(req, res, user.get)
 );
 
-userRouter.post("/create", (req, res) =>
-  makeCall(req, res, userController.create)
-);
-
-userRouter.patch("/update/:id", (req, res) =>
-  makeCall(req, res, userController.update)
-);
-
-userRouter.delete("/delete/:id", (req, res) =>
-  makeCall(req, res, userController.delete)
-);
-
-module.exports = userRouter;
+module.exports = router;
