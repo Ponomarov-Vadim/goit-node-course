@@ -14,6 +14,7 @@ const userSchema = new Schema({
     },
   },
   password: Schema.Types.String,
+  verificationToken: { type: Schema.Types.String, default: null },
   avatarURL: {
     type: Schema.Types.String,
     default: `${HOST}/images/base_avatar.jpg`,

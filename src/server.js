@@ -2,12 +2,11 @@ const dotenv = require("dotenv");
 const express = require("express");
 const cors = require("cors");
 const morgan = require("morgan");
+dotenv.config({ path: __dirname + "/../.env" });
 
 const { contact, auth, user } = require("./routers/");
 const { setupMongoDb } = require("./database/");
 const { upload } = require("./services/multer");
-
-dotenv.config({ path: __dirname + "/../.env" });
 
 const server = async (port, callback) => {
   try {
