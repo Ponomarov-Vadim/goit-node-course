@@ -4,7 +4,10 @@ const makeCall = async (req, res, func) => {
     const ctx = {
       mongoDb: req.mongoDb,
     };
+
     data.params = req.params || {};
+
+    data.file = req.file || {};
 
     const result = await func(data, ctx);
 

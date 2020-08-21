@@ -5,6 +5,7 @@ const morgan = require("morgan");
 
 const { contact, auth, user } = require("./routers/");
 const { setupMongoDb } = require("./database/");
+const { upload } = require("./services/multer");
 
 dotenv.config({ path: __dirname + "/../.env" });
 
@@ -22,6 +23,10 @@ const server = async (port, callback) => {
       req.mongoDb = mongoDb;
       next();
     });
+
+    app.use("/images", express.static(__dirname + "./../public/images"));
+
+    app.use(upload.single("avatar"));
 
     app.use("/api/contacts", contact);
     app.use("/auth", auth);

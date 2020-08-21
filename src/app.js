@@ -6,8 +6,8 @@ const {
 
 const log = (err) => {
   if (err) {
-    console.log("Erroe on listen: ", err);
-    process.exit(0);
+    console.log("Error on listen: ", err);
+    process.exit(1);
   }
   console.log(`Server start in ${PORT} port`);
 };
