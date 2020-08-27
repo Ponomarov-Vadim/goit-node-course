@@ -6,6 +6,10 @@ const { jwtMiddleware } = require("./../middleware/jwt");
 
 const router = Router();
 
+router.get("/verify/:verificationToken", (req, res) =>
+  makeCall(req, res, auth.verify)
+);
+
 router.post("/register", (req, res) => makeCall(req, res, auth.register));
 router.post("/login", (req, res) => makeCall(req, res, auth.logIn));
 router.post("/logout/:authorization", jwtMiddleware, (req, res) =>
