@@ -3,6 +3,8 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const { Schema } = mongoose;
 
+const { HOST } = process.env;
+
 const userSchema = new Schema({
   email: {
     type: Schema.Types.String,
@@ -12,6 +14,10 @@ const userSchema = new Schema({
     },
   },
   password: Schema.Types.String,
+  avatarURL: {
+    type: Schema.Types.String,
+    default: `${HOST}/images/base_avatar.jpg`,
+  },
   subscription: {
     type: Schema.Types.String,
     enum: ["free", "pro", "premium"],
